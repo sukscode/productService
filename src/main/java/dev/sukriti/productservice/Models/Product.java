@@ -1,5 +1,6 @@
 package dev.sukriti.productservice.Models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
@@ -18,6 +19,7 @@ public class Product extends BaseModel {
     private BigDecimal price;
     private String description;
     @ManyToOne
+    @JsonBackReference  //Allows serialization of products, but stops back loop
     private Category category;
     private String imageUrl;
 }
