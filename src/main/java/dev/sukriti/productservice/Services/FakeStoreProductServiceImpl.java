@@ -6,6 +6,7 @@ import dev.sukriti.productservice.DTOs.ProductDto;
 import dev.sukriti.productservice.Models.Category;
 import dev.sukriti.productservice.Models.Product;
 import jakarta.annotation.Nullable;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -15,18 +16,21 @@ import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
+@Qualifier("fakeStoreProductService")
 public class FakeStoreProductServiceImpl implements ProductService{
 
     //Allow to call 3rd Party Apis
     private final RestTemplateBuilder restTemplateBuilder;
-    private FakeStoreApi fakeStoreApi;
-    private Map<Long,Object> fakeStoreProducts = new HashMap<>();
+    private final FakeStoreApi fakeStoreApi;
+    private final Map<Long,Object> fakeStoreProducts = new HashMap<>();
 
     public FakeStoreProductServiceImpl(RestTemplateBuilder restTemplateBuilder, FakeStoreApi fakeStoreApi) {
         this.restTemplateBuilder = restTemplateBuilder;
@@ -46,7 +50,7 @@ public class FakeStoreProductServiceImpl implements ProductService{
         Product product = new Product();
         product.setId(productDto.getId());
         product.setTitle(productDto.getTitle());
-        product.setPrice(productDto.getPrice());
+        product.setPrice(BigDecimal.valueOf(productDto.getPrice()));
         //Category is object in Product DTO
         Category category = new Category();
         category.setName(productDto.getCategory());
@@ -66,11 +70,9 @@ public class FakeStoreProductServiceImpl implements ProductService{
         return answer;
     }
 
-    /*
-    It will return product object with details of the fetched product
-    The ID of category may be null but the name of category shall be
-    coorect.
-     */
+    // It will return product object with details of the fetched product
+    // The ID of category may be null but the name of category shall be
+    // correct.
 
     @Override
     public Product getSingleProduct(Long productId) {
@@ -86,6 +88,7 @@ public class FakeStoreProductServiceImpl implements ProductService{
         //Url, return type, parameter in url
 
         FakeStoreProductDto productDto = response.getBody();
+        assert productDto != null;
         return convertFakeStoreProductDtoToProduct(productDto);
     }
 
@@ -98,6 +101,7 @@ public class FakeStoreProductServiceImpl implements ProductService{
                 FakeStoreProductDto.class
         );
         FakeStoreProductDto productDto = response.getBody();
+        assert productDto != null;
         return convertFakeStoreProductDtoToProduct(productDto);
     }
 
@@ -109,7 +113,7 @@ public class FakeStoreProductServiceImpl implements ProductService{
         fakeStoreProductDto.setDescription(product.getDescription());
         fakeStoreProductDto.setImage(product.getImageUrl());
         fakeStoreProductDto.setTitle(product.getTitle());
-        fakeStoreProductDto.setPrice(product.getPrice());
+        fakeStoreProductDto.setPrice(product.getPrice().doubleValue());
         fakeStoreProductDto.setCategory(product.getCategory().getName());
 
         ResponseEntity<FakeStoreProductDto> fakeStoreProductDtoResponseEntity = requestForEntity(
@@ -119,6 +123,7 @@ public class FakeStoreProductServiceImpl implements ProductService{
                 FakeStoreProductDto.class,
                 productId
         );
+        assert fakeStoreProductDtoResponseEntity.getBody() != null;
         return convertFakeStoreProductDtoToProduct(fakeStoreProductDtoResponseEntity.getBody());
     }
 
@@ -129,7 +134,7 @@ public class FakeStoreProductServiceImpl implements ProductService{
         fakeStoreProductDto.setDescription(product.getDescription());
         fakeStoreProductDto.setImage(product.getImageUrl());
         fakeStoreProductDto.setTitle(product.getTitle());
-        fakeStoreProductDto.setPrice(product.getPrice());
+        fakeStoreProductDto.setPrice(product.getPrice().doubleValue());
         fakeStoreProductDto.setCategory(product.getCategory().getName());
 
         ResponseEntity<FakeStoreProductDto> fakeStoreProductDtoResponseEntity = requestForEntity(
@@ -139,6 +144,7 @@ public class FakeStoreProductServiceImpl implements ProductService{
                 FakeStoreProductDto.class,
                 productId
         );
+        assert fakeStoreProductDtoResponseEntity.getBody() != null;
         return convertFakeStoreProductDtoToProduct(fakeStoreProductDtoResponseEntity.getBody());
     }
 
@@ -147,4 +153,5 @@ public class FakeStoreProductServiceImpl implements ProductService{
         RestTemplate restTemplate = restTemplateBuilder.build();
         return false;
     }
+
 }

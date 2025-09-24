@@ -6,5 +6,5 @@ public interface SCMentorRepository extends JpaRepository<Mentor, Long> {
 
     Mentor save(Mentor mentor);
 
-    Mentor findMentorById(Long id);
+    Mentor findMentorByUserId(Long userId);
 }

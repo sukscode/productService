@@ -1,6 +1,7 @@
 package dev.sukriti.productservice.Services;
 
 import dev.sukriti.productservice.DTOs.ProductDto;
+import dev.sukriti.productservice.Execptions.NotFoundException;
 import dev.sukriti.productservice.Models.Product;
 import java.util.List;
 
@@ -8,7 +9,7 @@ public interface ProductService {
 
     List<Product> getAllProducts();
 
-    Product getSingleProduct(Long productId);
+    Product getSingleProduct(Long productId) throws NotFoundException;
     Product addNewProduct(ProductDto product);
 
     /*
@@ -19,9 +20,9 @@ public interface ProductService {
     name: Iphone17
     }
      */
-    Product updateProduct(Long productId, Product product);
+    Product updateProduct(Long productId, Product product) throws NotFoundException;
 
-    Product replaceProduct(Long productId, Product product);
+    Product replaceProduct(Long productId, Product product) throws NotFoundException;
 
     boolean deleteProduct(Long productId);
 }
