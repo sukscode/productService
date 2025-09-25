@@ -22,4 +22,5 @@ public class Product extends BaseModel {
     @JsonBackReference  //Allows serialization of products, but stops back loop
     private Category category;
     private String imageUrl;
+
 }
