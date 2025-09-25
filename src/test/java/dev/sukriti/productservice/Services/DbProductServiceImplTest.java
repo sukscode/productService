@@ -17,6 +17,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
+
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -51,7 +53,20 @@ class DbProductServiceImplTest {
         log.info("Returned product title: {}", returnedProduct.getTitle());
 
         verify(productRepository, times(1)).findProductById(1L);
+
+        //AssertJ
+        //Pick the data you want to validate first
+        //Call the validations you want to do
+        //
+        assertThat(product.getPrice())
+                .isEqualTo(BigDecimal.valueOf(120000))
+                .isGreaterThan(BigDecimal.valueOf(100000))
+                .isLessThan(BigDecimal.valueOf(10000))
+                .isPositive();
     }
+
+
+
 
     @Test
     void testGetSingleProductWhenProductNotFound() {
