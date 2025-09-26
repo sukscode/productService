@@ -8,6 +8,7 @@ import dev.sukriti.productservice.Models.Product;
 import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -25,6 +26,7 @@ import java.util.Map;
 
 @Service
 @Qualifier("fakeStoreProductService")
+@Primary
 public class FakeStoreProductServiceImpl implements ProductService{
 
     //Allow to call 3rd Party Apis

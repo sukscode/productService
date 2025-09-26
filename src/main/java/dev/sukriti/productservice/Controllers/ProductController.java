@@ -1,17 +1,16 @@
 package dev.sukriti.productservice.Controllers;
 
-import dev.sukriti.productservice.DTOs.GetSingleProductResponseDto;
-import dev.sukriti.productservice.DTOs.ProductDto;
+import dev.sukriti.productservice.Authentication.AuthenticationClient;
+import dev.sukriti.productservice.DTOs.*;
 import dev.sukriti.productservice.Execptions.NotFoundException;
 import dev.sukriti.productservice.Models.Category;
 import dev.sukriti.productservice.Models.Product;
+import dev.sukriti.productservice.Repository.ProductRepository;
 import dev.sukriti.productservice.Services.ProductService;
 import jakarta.annotation.Nullable;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.http.HttpStatus;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -20,19 +19,53 @@ import java.util.Optional;
 @RequestMapping("/products")
 public class ProductController {
     private final ProductService productService;
+    private final ProductRepository productRepository;
+    private final AuthenticationClient authenticationClient;
+
 
     //For switching Service
-    public ProductController(@Qualifier("dbProductService") ProductService productService) {
+    public ProductController(ProductService productService, ProductRepository productRepository, AuthenticationClient authenticationClient) {
+        this.productRepository = productRepository;
         this.productService = productService;
+        this.authenticationClient = authenticationClient;
     }
 
+    // Make only admins be able to access all products
     @GetMapping()
-    public ResponseEntity<List<Product>> getAllProducts(@Nullable @RequestHeader("AUTH_TOKEN") String token) {
-        if (token == null) {
+    public ResponseEntity<List<Product>> getAllProducts(@Nullable @RequestHeader("AUTH_TOKEN") String token,
+                                                        @Nullable @RequestHeader("USER_ID") Long userId) {
+        // check if token exists
+        if (token == null || userId == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
+
+        ValidatetokenResponseDto response = authenticationClient.validate(token, userId);
+
+        // check if token is valid
+        if (response.getSessionStatus().equals(SessionStatus.INVALID)) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // validate token
+        // RestTemplate rt = new RestTemplate();
+        //  rt.get("localhost:9090/auth/validate?)
+
+        // check if user has permissions
+        boolean isUserAdmin = false;
+        for (Role role: response.getUserDto().getRoles()) {
+            if (role.getName().equals("ADMIN")) {
+                isUserAdmin = true;
+            }
+        }
+
+        if (!isUserAdmin) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         List<Product> products = productService.getAllProducts();
-        return new ResponseEntity<>(products,HttpStatus.OK);
+
+//        products.get(0).setPrice(100); /// Bug induced in my code
+        return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
     @GetMapping("/{productId}")
