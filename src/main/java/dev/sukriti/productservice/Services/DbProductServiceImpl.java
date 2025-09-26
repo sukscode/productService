@@ -7,12 +7,14 @@ import dev.sukriti.productservice.Models.Product;
 import dev.sukriti.productservice.Repository.CategoryRepository;
 import dev.sukriti.productservice.Repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @Qualifier("dbProductService")
+@Primary
 public class DbProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
