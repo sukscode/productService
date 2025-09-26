@@ -6,6 +6,7 @@ import dev.sukriti.productservice.Execptions.NotFoundException;
 import dev.sukriti.productservice.Models.Category;
 import dev.sukriti.productservice.Models.Product;
 import dev.sukriti.productservice.Services.ProductService;
+import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +27,12 @@ public class ProductController {
     }
 
     @GetMapping()
-    public List<Product> getAllProducts() {
-        return productService.getAllProducts();
+    public ResponseEntity<List<Product>> getAllProducts(@Nullable @RequestHeader("AUTH_TOKEN") String token) {
+        if (token == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        List<Product> products = productService.getAllProducts();
+        return new ResponseEntity<>(products,HttpStatus.OK);
     }
 
     @GetMapping("/{productId}")
