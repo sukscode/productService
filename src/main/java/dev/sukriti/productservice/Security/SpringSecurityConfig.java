@@ -13,8 +13,10 @@ public class SpringSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                     //   .requestMatchers("/messages/**").access(hasScope("message:read"))
-                        .requestMatchers("/products").hasAuthority("ADMIN")
+                        //   .requestMatchers("/messages/**").access(hasScope("message:read"))
+                        //.requestMatchers("/products").hasAuthority("ADMIN")
+                        .requestMatchers("/products").permitAll()
+                        .requestMatchers("/webhooks/stripe/").permitAll()
                         .requestMatchers("/products/{id}").permitAll()//-->Authorize for all except signup
                         .anyRequest().permitAll()
                 )
