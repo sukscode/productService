@@ -9,6 +9,7 @@ import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -19,10 +20,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Qualifier("fakeStoreProductService")
@@ -33,8 +31,10 @@ public class FakeStoreProductServiceImpl implements ProductService{
     private final RestTemplateBuilder restTemplateBuilder;
     private final FakeStoreApi fakeStoreApi;
     private final Map<Long,Object> fakeStoreProducts = new HashMap<>();
+    private RedisTemplate<Long,Object> redisTemplate;
 
-    public FakeStoreProductServiceImpl(RestTemplateBuilder restTemplateBuilder, FakeStoreApi fakeStoreApi) {
+    public FakeStoreProductServiceImpl(RestTemplateBuilder restTemplateBuilder, FakeStoreApi fakeStoreApi, RedisTemplate<Long, Object> redisTemplate) {
+        this.redisTemplate = redisTemplate;
         this.restTemplateBuilder = restTemplateBuilder;
         this.fakeStoreApi = fakeStoreApi;
     }
@@ -78,11 +78,16 @@ public class FakeStoreProductServiceImpl implements ProductService{
 
     @Override
     public Product getSingleProduct(Long productId) {
+        FakeStoreProductDto fakeStoreProductDto;
         RestTemplate restTemplate = restTemplateBuilder.build();
         //whatever JSON you are getting from url try to convert it into
         //ProductDTO class because it is same as model at URL.
-
-        ResponseEntity<FakeStoreProductDto> response = restTemplate.getForEntity(
+        if (redisTemplate.opsForHash().get("PRODUCTS",productId)){
+        if (fakeStoreProducts.containsKey(productId)) {
+            return Optional.of(convertFakeStoreProductDtoToProduct(Fa))
+        }
+        }
+            ResponseEntity<FakeStoreProductDto> response = restTemplate.getForEntity(
                 "https://fakestoreapi.com/products/{id}",
                 FakeStoreProductDto.class,
                 productId
