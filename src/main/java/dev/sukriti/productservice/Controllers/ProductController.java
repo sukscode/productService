@@ -8,6 +8,7 @@ import dev.sukriti.productservice.Models.Product;
 import dev.sukriti.productservice.Repository.ProductRepository;
 import dev.sukriti.productservice.Services.ProductService;
 import jakarta.annotation.Nullable;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,14 @@ public class ProductController {
         this.authenticationClient = authenticationClient;
     }
 
+    @GetMapping("/paginated")
+    public ResponseEntity<Page<Product>> getProducts(@RequestBody GetProductsRequestDto request) {
+        return ResponseEntity.of(Optional.ofNullable(productService.getProducts(
+                request.getNumberOfProducts(),
+                request.getOffset()
+        )));
+
+    }
     // Make only admins be able to access all products
     @GetMapping()
     public ResponseEntity<List<Product>> getAllProducts(@Nullable @RequestHeader("AUTH_TOKEN") String token,

@@ -7,6 +7,8 @@ import dev.sukriti.productservice.Models.Product;
 import dev.sukriti.productservice.Repository.CategoryRepository;
 import dev.sukriti.productservice.Repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +29,13 @@ public class DbProductServiceImpl implements ProductService {
     @Override
     public List<Product> getAllProducts() {
         return productRepository.findAllProducts();
+    }
+
+    @Override
+    public Page<Product> getProducts(int numberOfProducts, int offset) {
+       Page<Product> products = productRepository.findAll(
+               PageRequest.of((offset/numberOfProducts), numberOfProducts));
+        return products;
     }
 
     @Override

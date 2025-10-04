@@ -9,6 +9,7 @@ import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -63,6 +64,11 @@ public class FakeStoreProductServiceImpl implements ProductService{
     }
 
     @Override
+    public Page<Product> getProducts(int numberOfProducts, int offset) {
+        return null;
+    }
+
+    @Override
     public List<Product> getAllProducts() {
         List<FakeStoreProductDto> fakeStoreProductDtos = fakeStoreApi.getAllProducts();
         List<Product> answer = new ArrayList<>();
@@ -82,9 +88,9 @@ public class FakeStoreProductServiceImpl implements ProductService{
         RestTemplate restTemplate = restTemplateBuilder.build();
         //whatever JSON you are getting from url try to convert it into
         //ProductDTO class because it is same as model at URL.
-        if (redisTemplate.opsForHash().get("PRODUCTS",productId)){
+        if ((boolean) redisTemplate.opsForHash().get(Long.valueOf("PRODUCTS"),productId)){
         if (fakeStoreProducts.containsKey(productId)) {
-            return Optional.of(convertFakeStoreProductDtoToProduct(Fa))
+            return Optional.of(convertFakeStoreProductDtoToProduct((FakeStoreProductDto) fakeStoreProducts.get(productId))).orElseThrow();
         }
         }
             ResponseEntity<FakeStoreProductDto> response = restTemplate.getForEntity(
